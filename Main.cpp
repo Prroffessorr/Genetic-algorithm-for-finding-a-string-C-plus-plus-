@@ -6,29 +6,25 @@
 #include <math.h> // для abs()
 #include <conio.h>
 #include <algorithm>
-#include <ctime>
 
 #define GA_POPSIZE		10048		// размер популяции
 #define GA_MAXITER		16384		// максимальное число итераций
 #define GA_ELITRATE		0.10f		// элитарность
 #define GA_MUTATIONRATE	0.25f			// мутации
 #define GA_MUTATION		RAND_MAX * GA_MUTATIONRATE
-// Ваше прізвище, ім’я, по-батькові,
-//ВНЗ, групу та спеціальність.
-//Tatarnikov A.O. XNURE KITm-20-1
-#define GA_TARGET std::string("Tatarnykov A.O. XNURE KITm-20-1")
-int i = 0;
 
+#define GA_TARGET std::string("Prroffessorr")
+int iteration = 0;
 using namespace std;
 
 
 struct ga_struct
 {
 	string str;						// строка
-	unsigned int fitness;					// пригодность
+	unsigned int fitness;			// пригодность
 };
 
-typedef vector<ga_struct> ga_vector;			// для краткости
+typedef vector<ga_struct> ga_vector;
 
 void init_population(ga_vector &population,
 	ga_vector &buffer)
@@ -108,15 +104,15 @@ void mutate2(ga_struct &member)
 
 }
 
-//Скремблирование
+//Скремблирование(Еще не проверн до конца, использовать на ваш страх и риск)
+
 void mutate3(ga_struct &member)
 {
 
 	int tsize = GA_TARGET.size();
-	int delta = (rand() % 90) + 32;
 	int ipos = rand() % tsize;
 	int spos = rand() % tsize;
-	//std::random_shuffle(member.str.begin(), member.str.end());
+
 	//Скремблирование всей строки
 	std::size_t index = rand() % tsize;
 	
@@ -135,17 +131,8 @@ void mutate4(ga_struct &member)
 {
 	int tsize = GA_TARGET.size();
 	int ipos = rand() % tsize;
-	int delta = (rand() % 90) + 32;
 	int spos = rand() % tsize;
-	int esize = GA_POPSIZE * GA_ELITRATE;
 
-	//std::string str1 = member.str.substr(0, spos);
-	//std::string str2 = member.str.substr(spos, esize - spos);
-	//std::random_shuffle(str1.begin(), str1.end());
-	//std::random_shuffle(str2.begin(), str2.end());
-	//member.str = str1 + str2;
-
-	//Меняем два элемента местами(Hello Hello world работает)
 	char temp;
 	temp = member.str[tsize-ipos];
 	member.str[tsize-ipos] = member.str[tsize-spos];
@@ -162,34 +149,15 @@ void mutate5(ga_struct &member)
 	int spos = rand() % tsize;
 	int esize = GA_POPSIZE * GA_ELITRATE;
 
-	//int str_size = GA_TARGET.size();
-	//int size = abs(str_size / 3);
-	//std::string str1 = member.str;
-	//std::swap(str1[rand() % GA_TARGET.size()], str1[rand() % GA_TARGET.size()+1]);
-	//member.str = str1;
 
-	//for (i = 0; i<ipos; i++) {
-	//member.str.push_back(i);
-	//random_shuffle(member.str.begin(), member.str.end());
-	//}
+	int tmp = member.str[tsize - ipos];//получаем послед элем масива
 
-	//for (int i = 0; i < tsize; i++) {
-	//int temp = 0;
-	//temp = member.str[ipos];
-	//member.str[ipos] = member.str[tsize - spos];
-	//member.str[tsize - spos] = temp;
+	member.str[abs(tsize - spos- ipos/2)] = tmp;//меняем конец с началом
 
-		//Мутация трех генов(с Hello Hello world работает хорошо)
+	member.str[abs(tsize - spos)] = member.str[abs(tsize - spos- ipos/2)];//меняем середину с началом
 
-		int tmp = member.str[tsize - ipos];//получаем послед элем масива
+	member.str[tsize - ipos] = member.str[abs(tsize - spos)];// меняем конец с началом
 
-		member.str[abs(tsize - spos- ipos/2)] = tmp;//меняем конец с началом
-
-		member.str[abs(tsize - spos)] = member.str[abs(tsize - spos- ipos/2)];//меняем середину с началом
-
-		member.str[tsize - ipos] = member.str[abs(tsize - spos)];// меняем конец с началом
-
-	//}
 
 }
 void mate(ga_vector &population, ga_vector &buffer)
@@ -212,17 +180,15 @@ void mate(ga_vector &population, ga_vector &buffer)
 			//population[i2].str.substr(spos, esize - spos);
 
 		//Многоточечный кроссовер
-		//Работает с (с Hello Hello world работает хорошо)
+
 		int cross = rand() % 10+1;
 		
 		if (cross > 5) {
-			//Работает с (с Hello Hello world работает хорошо)
-			//buffer[i].str = population[i2].str.replace(abs(tsize-spos), abs(spos), population[i1].str, abs(tsize - spos), abs(spos));
+			
 			buffer[i].str = population[i2].str.replace(abs(tsize - spos-1), abs(spos - cross), population[i1].str, abs(tsize - spos-1), abs(spos-cross));
 		}
 		else  {
-			//Работает с (с Hello Hello world работает хорошо)
-			//buffer[i].str = population[i1].str.replace(abs(tsize-spos), abs(spos), population[i2].str, abs(tsize - spos), abs(spos));
+			
 			buffer[i].str = population[i1].str.replace(abs(tsize-spos-1), abs(spos - cross), population[i2].str, abs(tsize - spos-1), abs(spos-cross));
 		}
 
@@ -232,7 +198,7 @@ void mate(ga_vector &population, ga_vector &buffer)
 
 inline void print_best(ga_vector &gav)
 {
-	cout << "Best: " << gav[0].str << " (" << gav[0].fitness << ")" << " Iteration:" << i++ << endl;
+	cout << "Best: " << gav[0].str << " (" << gav[0].fitness << ")" << " Iteration:" << iteration++ << endl;
 }
 
 inline void swap(ga_vector *&population,
